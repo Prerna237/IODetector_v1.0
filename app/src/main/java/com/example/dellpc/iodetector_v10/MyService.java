@@ -11,6 +11,9 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.media.AudioFormat;
+import android.media.AudioRecord;
+import android.media.MediaRecorder;
 import android.os.BatteryManager;
 import android.os.Binder;
 import android.os.IBinder;
@@ -50,7 +53,7 @@ public class MyService extends Service {
     SensorEventListener magEventListener;
     float light_intensity_val;
     BroadcastReceiver mBatInfoReceiver;
-
+    SoundMeter sm;
     public MyService() {
     }
 
@@ -59,7 +62,7 @@ public class MyService extends Service {
         super.onCreate();
         //cell signal strength, light intensity, time of day and proximity value
         //battery temperature, sound amplitude  magnetic variance
-
+        sm=new SoundMeter();
         csv_file_name_1 = android.os.Environment.getExternalStorageDirectory().getAbsolutePath()+"/class_1"+".csv";
         csv_file_name_2 = android.os.Environment.getExternalStorageDirectory().getAbsolutePath()+"/class_2"+".csv";
         headers_c1= new String[]{"Cell_Signal_Strength","Light_Intensity","Time","Proximity_val"};
@@ -156,10 +159,10 @@ public class MyService extends Service {
                 flag3=true;
             }
         };
-
+        csv_2[1]=Double.toString(getAmp(sm)/10);
         this.registerReceiver(this.mBatInfoReceiver,new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         csv_1[2]=""+(System.currentTimeMillis());
-        csv_2[1]="audio";
+        //csv_2[1]="audio";
         csv_2[2]="location";
         while(flag==false) {
             if (flag1 == true && flag2 == true && flag3 == true && flag0 == true) {
@@ -228,6 +231,15 @@ public class MyService extends Service {
     private void writeToCSV(String[] csvValues)
     {}
 
+    private double getAmp(SoundMeter sm)
+    {
+        double amp;
+        sm.start();
+        amp=sm.getAmplitude();
+        sm.stop();
+        return amp;
+    }
+
     class MyPhoneStateListener extends PhoneStateListener {
 
         @Override
@@ -244,6 +256,38 @@ public class MyService extends Service {
         MyService getService() {
             // Return this instance of LocalService so clients can call public methods
             return MyService.this;
+        }
+
+    }
+    public class SoundMeter {
+
+        private AudioRecord ar = null;
+        private int minSize;
+
+        public void start() {
+            minSize= AudioRecord.getMinBufferSize(8000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+            ar = new AudioRecord(MediaRecorder.AudioSource.MIC, 8000,AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT,minSize);
+            ar.startRecording();
+        }
+
+        public void stop() {
+            if (ar != null) {
+                ar.stop();
+            }
+        }
+
+        public double getAmplitude() {
+            short[] buffer = new short[minSize];
+            ar.read(buffer, 0, minSize);
+            int max = 0;
+            for (short s : buffer)
+            {
+                if (Math.abs(s) > max)
+                {
+                    max = Math.abs(s);
+                }
+            }
+            return max;
         }
 
     }
