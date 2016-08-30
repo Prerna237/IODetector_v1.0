@@ -45,7 +45,6 @@ import static java.lang.Thread.sleep;
 public class MyService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     public final String TAG = "MyService";
     private IBinder binder_service;
-
     String[] headers_c1, headers_c2;
     String[] csv_1 = new String[5];
     String[] csv_2 = new String[4];
@@ -63,8 +62,6 @@ public class MyService extends Service implements GoogleApiClient.ConnectionCall
     Sensor prox_sensor;
     SensorEventListener proxEventListener;
     Sensor mag_sensor;
-    SensorEventListener magEventListener;
-    Thread connect;
     BroadcastReceiver mBatInfoReceiver;
     SoundMeter sm;
     GoogleApiClient mGoogleApiClient;
@@ -72,7 +69,7 @@ public class MyService extends Service implements GoogleApiClient.ConnectionCall
     Thread t_light,t_proximity;
     float light_val;
     float prox_value;
-    AsyncTask md;
+
     public MyService() {
 
     }
@@ -81,9 +78,9 @@ public class MyService extends Service implements GoogleApiClient.ConnectionCall
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "ON CREATE");
-        //cell signal strength, light intensity, time of day and proximity value
-        //battery temperature, sound amplitude  magnetic variance
+
         sm = new SoundMeter();
+       //building google api client
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -103,6 +100,7 @@ public class MyService extends Service implements GoogleApiClient.ConnectionCall
         mag_sensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         Log.d(TAG, "Light Sensor:" + light_sensor);
         Log.d(TAG, "Prox Sensor:" + light_sensor);
+        //Gives light sensor values
         t_light=new Thread(new Runnable() {
             @Override
             public void run() {
@@ -112,6 +110,7 @@ public class MyService extends Service implements GoogleApiClient.ConnectionCall
                         public void onSensorChanged(SensorEvent event) {
                             light_val = event.values[0];
                             System.out.println("Sending light:" + light_val);
+                            //Added Light sensor value
                             csv_1[1]=""+light_val;
                             sensorManager.unregisterListener(lightEventListener, light_sensor);
                         }
@@ -127,7 +126,7 @@ public class MyService extends Service implements GoogleApiClient.ConnectionCall
 
             }
         });
-
+        //Gives proximity values
         t_proximity=new Thread(new Runnable() {
             @Override
             public void run() {
@@ -174,7 +173,6 @@ public class MyService extends Service implements GoogleApiClient.ConnectionCall
         mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         mTelephonyManager.listen(mPhoneStatelistener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
 
-        //Added Light sensor value
         //Added System Time
         csv_1[2] = "" + (System.currentTimeMillis());
 
@@ -183,18 +181,18 @@ public class MyService extends Service implements GoogleApiClient.ConnectionCall
             public void onReceive(Context arg0, Intent intent) {
                 // TODO Auto-generated method stub
                 int temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) / 10;
-                System.out.println("battery Temp " + temp);
+                //Added Battery temperature
                 csv_2[0] = Integer.toString(temp);
 
             }
         };
         this.registerReceiver(this.mBatInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 
+        //Added signal Strength
         csv_2[1] = Double.toString(getAmp(sm) / 10);
         Log.d(TAG,"AMP= "+csv_2[1]);
 
-        Log.d(TAG,"something");
-        Toast.makeText(this.getBaseContext(),"Press Stop Button",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this.getBaseContext(),"Press Stop Button after 3secs",Toast.LENGTH_SHORT).show();
 
         return binder_service;
     }
