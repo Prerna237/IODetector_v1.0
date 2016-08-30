@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     Intent it;
     MyService service;
     Boolean bounded;
+    static String label;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +46,14 @@ public class MainActivity extends AppCompatActivity {
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (rb_indoor.isChecked())
+                {
+                    label="Indoor";
+                }
+                else
+                {
+                    label="Outdoor";
+                }
                 bindService(it, mServiceConnection,Context.BIND_AUTO_CREATE);
 
             }
