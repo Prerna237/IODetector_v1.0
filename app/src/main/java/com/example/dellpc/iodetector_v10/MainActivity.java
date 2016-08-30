@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
     RadioButton rb_indoor,rb_outdoor;
-    Button b1,b2,b3;
+    Button b1,b2,b3,b_stop;
     TextView out;
     Intent it;
     MyService service;
@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         b1=(Button)findViewById(R.id.button);
         b2=(Button)findViewById(R.id.button2);
         b3=(Button)findViewById(R.id.button3);
+        b_stop=(Button)findViewById(R.id.button4);
         out=(TextView)findViewById(R.id.textView);
         service=new MyService();
         it=new Intent(this,MyService.class);
@@ -44,14 +45,14 @@ public class MainActivity extends AppCompatActivity {
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bindService(it, mServiceConnection, Context.BIND_AUTO_CREATE);
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                unbindService(mServiceConnection);
+                bindService(it, mServiceConnection,Context.BIND_AUTO_CREATE);
 
+            }
+        });
+        b_stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                unbindService(mServiceConnection);
             }
         });
     }
