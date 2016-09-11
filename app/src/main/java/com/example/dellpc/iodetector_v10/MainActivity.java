@@ -8,8 +8,6 @@ import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
@@ -20,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
     Button b1,b2,b3,b_stop;
     TextView out;
     Intent it;
-    MyService service;
+    MyService_Collection service;
     Boolean bounded;
     static String label;
 
@@ -35,8 +33,8 @@ public class MainActivity extends AppCompatActivity {
         b3=(Button)findViewById(R.id.button3);
         b_stop=(Button)findViewById(R.id.button4);
         out=(TextView)findViewById(R.id.textView);
-        service=new MyService();
-        it=new Intent(this,MyService.class);
+        service=new MyService_Collection();
+        it=new Intent(this,MyService_Collection.class);
 
     }
 
@@ -54,31 +52,31 @@ public class MainActivity extends AppCompatActivity {
                 {
                     label="Outdoor";
                 }
-                bindService(it, mServiceConnection,Context.BIND_AUTO_CREATE);
+                bindService(it, mServiceConnection_collect,Context.BIND_AUTO_CREATE);
 
             }
         });
         b_stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                unbindService(mServiceConnection);
+                unbindService(mServiceConnection_collect);
             }
         });
     }
 
 
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
+    private ServiceConnection mServiceConnection_collect = new ServiceConnection() {
         public static final String TAG = "Service Connection";
         @Override
         public void onServiceDisconnected(ComponentName name) {
             bounded = false;
             Log.d(TAG, "Disconnected controller");
-            unbindService(mServiceConnection);
+            unbindService(mServiceConnection_collect);
         }
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder myService) {
-            MyService.binders myBinder = (MyService.binders) myService;
+            MyService_Collection.binders myBinder = (MyService_Collection.binders) myService;
             service = myBinder.getService();
             bounded = true;
             Log.d(TAG,"onServiceConnected ");

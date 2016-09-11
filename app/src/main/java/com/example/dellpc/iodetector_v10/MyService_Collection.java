@@ -16,13 +16,11 @@ import android.location.Location;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.SignalStrength;
@@ -42,8 +40,8 @@ import java.util.Arrays;
 
 import static java.lang.Thread.sleep;
 
-public class MyService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-    public final String TAG = "MyService";
+public class MyService_Collection extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+    public final String TAG = "MyService_Collection";
     private IBinder binder_service;
     String[] headers_c1, headers_c2;
     String[] csv_1 = new String[5];
@@ -70,7 +68,7 @@ public class MyService extends Service implements GoogleApiClient.ConnectionCall
     float light_val;
     float prox_value;
 
-    public MyService() {
+    public MyService_Collection() {
 
     }
 
@@ -199,7 +197,7 @@ public class MyService extends Service implements GoogleApiClient.ConnectionCall
 
     @Override
     public boolean onUnbind(Intent intent) {
-        Log.d(TAG,"Enter onUnBind of MyService");
+        Log.d(TAG,"Enter onUnBind of MyService_Collection");
         mGoogleApiClient.disconnect();
         csv_1[4]=MainActivity.label;
         csv_2[3]=MainActivity.label;
@@ -312,9 +310,9 @@ public class MyService extends Service implements GoogleApiClient.ConnectionCall
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public class binders extends Binder
     {
-        MyService getService() {
+        MyService_Collection getService() {
             // Return this instance of LocalService so clients can call public methods
-            return MyService.this;
+            return MyService_Collection.this;
         }
 
     }
